@@ -7,12 +7,22 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(express.static("public"));
 
 mongoose.connect("mongodb://127.0.0.1:27017/coLab", { useNewUrlParser: true, useUnifiedTopology: true });
+
 const projectSchema = new mongoose.Schema({
     "title" : String,
     "description" : String
 })
 
+const applicationSchema = new mongoose.Schema({
+    "name" : String,
+    "email" : String,
+    "phone" : Number,
+    "linkedin" : String
+});
+
 const Project = mongoose.model("Project", projectSchema);
+
+const Application = mongoose.model("Application", applicationSchema);
 
 app.get("/", (req, res)=>{
     res.sendFile(__dirname+"/projectList.html");
@@ -53,6 +63,10 @@ app.get('/projects/:id', function(req, res) {
         });
 });      
 
+app.get("/application", (req, res) => {
+    res.sendFile(__dirname + "/applicationForm.html");
+});
+
 
 app.post("/projects", (req, res)=>{
     const newProject = new Project({
@@ -60,6 +74,18 @@ app.post("/projects", (req, res)=>{
         description : req.body["project-description"]
     });
     newProject.save();
+    res.redirect("/");
+});
+
+app.post("/application", (req, res) => {
+    const newApplication = new Application({
+        "name" : req.body.name,
+        "email" : req.body.email,
+        "phone" : req.body.phone,
+        "linkedin" : req.body.linkedin
+    });
+    newApplication.save();
+    //res.write("Response is successfully saved");
     res.redirect("/");
 });
 
